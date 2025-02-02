@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { FC, MouseEvent, ChangeEvent } from 'react';
 
 import PopUpModal from './PopUpModal';
+import ResultCard from './ResultCard';
 
 import './style.css'
 
 // List of Quiz Questions
-type quiz_question = {
+export type QuizQuestions = {
     id: number,
     questions: string,
     answer_options: {
@@ -22,7 +23,7 @@ type quiz_question = {
 }
 
 
-let quizQuestion: quiz_question[] = [
+export const quizQuestion: QuizQuestions[] = [
     {
         id: 0,
         questions: "Which is the largest animal in the world?",
@@ -77,6 +78,7 @@ let quizQuestion: quiz_question[] = [
     
 const QuizContent:FC = () => {
 
+    const [quizQuestions, setQuizQuestions] = useState<QuizQuestions[]>(quizQuestion);
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string|null>(null);
     const [score, setScore] = useState<number>(0);
@@ -87,15 +89,27 @@ const QuizContent:FC = () => {
     const [modalHTML, setModalHTML] = useState<any>();
     const [modalColor, setModalColor] = useState<any>();
 
-    let nextButton = document.querySelector<HTMLButtonElement>("#next-button");
-    let previousButton = document.querySelector<HTMLButtonElement>("#previous-button");
-    let submitButton = document.querySelector<HTMLButtonElement>("#submit-button");
+    // let nextButton = document.querySelector<HTMLButtonElement>("#next-button");
+    // let previousButton = document.querySelector<HTMLButtonElement>("#previous-button");
+    // let submitButton = document.querySelector<HTMLButtonElement>("#submit-button");
 
     const handleStart = () => {
+
+        const resetQuestions = quizQuestion.map(q => ({
+            ...q,
+            selected_answer: null // Reset all selected answers
+        }));
+
+        setQuizQuestions(resetQuestions);
         setCurrentIndex(0);
-        setSelectedAnswer("");
+        setSelectedAnswer(null);
         setScore(0);
+        setOpenModal(false);
         setQuizComplete(false);
+    }
+
+    const handleRefresh = () => {
+        window.location.reload();
     }
 
     const HandleNextButton = () => {
@@ -126,17 +140,26 @@ const QuizContent:FC = () => {
                 setSelectedAnswer(null);
                 //quizQuestion[currentIndex].selected_answer = selectedAnswer;
             }
-            
+
+            const allQuestionsAnswered = quizQuestion.every(q=>q.selected_answer !== null);
+
+            if(allQuestionsAnswered){
+                setQuizComplete(true);
+            }else{
+                setQuizComplete(false);
+            }
+   
             
         }
 
         handleModal();
     }
 
-    const handleSelectedAnswer = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleSelectedAnswer = (e: ChangeEvent<HTMLInputElement>, questionID: number, selectedOption: string) => {
         setSelectedAnswer(e.target.value);
         console.log(selectedAnswer);
-        // console.log("Selected Answer: "+selectedAnswer);
+        // console.log("Selected Answer: "+selectedAnswer)
+        setQuizQuestions(prevQuestions => prevQuestions.map(q=>q.id === questionID ? {...q, selected_answer: selectedOption}:q));
     }
 
     const handleModal = () => {
@@ -165,60 +188,51 @@ const QuizContent:FC = () => {
 
 
     useEffect(()=>{
-        //console.log(currentIndex);
         handleStart();
     }, []);
 
     return (
         <>
-        <div className={`quiz-container ${openModal ? "blur": null}`} id="quiz-container">
-            <div className="quiz-container-content">
-                <div className="quiz-header">
-                    <h1>MCQ Quiz</h1>
-                    <p>
-                        Your Score is : <b id="scorecard">
-                            <b id="score_obtained">{ score }</b>/<b id="total_score">{ quizQuestion.length }</b></b>
-                    </p>
-                </div>
-                <div className="quiz-body" id="quiz-body">
-                    <div className="quiz-info" >
-                        <h2 id="question">{ quizQuestion[currentIndex].questions }</h2>
-                        <ul>
-                            {
-                                Object.entries(quizQuestion[currentIndex].answer_options).map(([key, value])=>(
-                                    <li key={key}>
-                                        <input type="radio" name="answer" id={key} value={key} checked={selectedAnswer === key} onChange={ handleSelectedAnswer } className="answer" />
-                                        <label htmlFor={key} id="a_text">{ value }</label>
-                                    </li>
-                                ))
-                            }
-                            {/* <li>
-                                <input type="radio" name="answer" id="a" className="answer" />
-                                <label htmlFor="a" id="a_text">Answer</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="answer" id="b" className="answer" />
-                                <label htmlFor="b" id="b_text">Answer</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="answer" id="c" className="answer" />
-                                <label htmlFor="c" id="c_text">Answer</label>
-                            </li>
-                            <li>
-                                <input type="radio" name="answer" id="d" className="answer" />
-                                <label htmlFor="d" id="d_text">Answer</label>
-                            </li> */}
-                        </ul>
-                        <button className="btn" id="submit-button" onClick={handleSubmit} disabled={quizQuestion[currentIndex].selected_answer != null}>Submit Answer</button>
+        {
+            !quizComplete ? (
+            <>
+                <div className={`quiz-container ${openModal ? "blur": null}`} id="quiz-container">
+                    <div className="quiz-container-content">
+                        <div className="quiz-header">
+                            <h1>MCQ Quiz</h1>
+                            <p>
+                                Your Score is : <b id="scorecard">
+                                    <b id="score_obtained">{ score }</b>/<b id="total_score">{ quizQuestion.length }</b></b>
+                            </p>
+                        </div>
+                        <div className="quiz-body" id="quiz-body">
+                            <div className="quiz-info" >
+                                <h2 id="question">{ quizQuestion[currentIndex].questions }</h2>
+                                <ul>
+                                    {
+                                        Object.entries(quizQuestion[currentIndex].answer_options).map(([key, value])=>(
+                                            <li key={key}>
+                                                <input type="radio" name="answer" id={key} value={key} checked={quizQuestions[currentIndex].selected_answer === key} onChange={ (e)=>handleSelectedAnswer(e, quizQuestion[currentIndex].id, key) } className="answer" />
+                                                <label htmlFor={key} id="a_text">{ value }</label>
+                                            </li>
+                                        ))
+                                    }
+
+                                </ul>
+                                <button className="btn" id="submit-button" onClick={handleSubmit} disabled={quizQuestion[currentIndex].selected_answer != null}>Submit Answer</button>
+                            </div>
+                        </div>
+                        <div className="button-div">
+                            <button className="btn" id="previous-button" onClick={HandlePreviousButton} disabled={currentIndex === 0}>Previous</button>
+                            <button className="btn" id="next-button" onClick={HandleNextButton} disabled={currentIndex === quizQuestion.length-1}>Next</button>
+                        </div>
                     </div>
                 </div>
-                <div className="button-div">
-                    <button className="btn" id="previous-button" onClick={HandlePreviousButton} disabled={currentIndex === 0}>Previous</button>
-                    <button className="btn" id="next-button" onClick={HandleNextButton} disabled={currentIndex === quizQuestion.length-1}>Next</button>
-                </div>
-            </div>
-        </div>
-        <PopUpModal modalText={modalText} modalHTML={modalHTML} modalColor={modalColor} modalActive={openModal} closeModal={setOpenModal} />
+                <PopUpModal modalText={modalText} modalHTML={modalHTML} modalColor={modalColor} modalActive={openModal} closeModal={setOpenModal} />
+            </>
+            ) : <ResultCard score={score} total={quizQuestions.length} restart={handleRefresh} questions={quizQuestion} />
+        }
+
         </>
     )
 }

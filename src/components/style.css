@@ -85,6 +85,14 @@ h2#question{
     background-color: transparent;
 }
 
+.quiz-info ul li input.answer{
+    margin-right: 7.5px;
+}
+
+.quiz-info ul li label:hover, .quiz-info ul li input.answer:hover {
+    cursor: pointer;
+}
+
 /* .quiz-info ul li.correct{
     border: 1px solid #9aeabc;
     color: #9aeabc;
@@ -161,6 +169,14 @@ button.btn:disabled{
     margin-bottom: 15px;
 }
 
+.final-answer-container .final-answer-content{
+    text-align: center;
+}
+
+.final-answer-container .final-answer-content button.btn{
+    margin: 0 5px;
+}
+
 #popup{
     position: fixed;
     top: 40%;
@@ -183,6 +199,31 @@ button.btn:disabled{
     transition: 0.5s;
 }
 
+.answer-container-inner{
+    background-color: #b8c6db;
+    width: 90%;
+    max-width: 550px;
+    border-radius: 10px;
+    padding: 25px;
+}
+
+.answer-container-inner .answer-content{
+    padding: 15px 0;
+}
+
+.answer-container-inner .answer-content:last-child{
+    margin-bottom: 15px;
+}
+.answer-container-inner .answer-content button{
+    margin-top: 10px;
+}
+
+.answer-container-inner .answer-content h2{
+    font-size: 22px;
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+  
 @media only screen and (min-width: 679px) and (max-width: 992px){
     .quiz-container{
         max-width: 480px;
