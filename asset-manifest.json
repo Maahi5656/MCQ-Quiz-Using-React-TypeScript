@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MCQ-Quiz-Using-React-TypeScript/static/css/main.ea152a68.css",
+    "main.js": "/MCQ-Quiz-Using-React-TypeScript/static/js/main.7a0f7656.js",
+    "index.html": "/MCQ-Quiz-Using-React-TypeScript/index.html",
+    "main.ea152a68.css.map": "/MCQ-Quiz-Using-React-TypeScript/static/css/main.ea152a68.css.map",
+    "main.7a0f7656.js.map": "/MCQ-Quiz-Using-React-TypeScript/static/js/main.7a0f7656.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ea152a68.css",
+    "static/js/main.7a0f7656.js"
+  ]
+}
